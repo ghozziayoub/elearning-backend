@@ -3,10 +3,20 @@
  * cors : eli y5li les WS tilisable par les autres applications
  * body-parser : y7aded naw3eyet les données eli de5lin/5arjin mel backend 
  * nodemon : refresh automatique mta3 serveur
+ * bcryptjs : ta3mlelna el cryptage de donnée
+ * mongoose : ODM ,
+ * sequelize : ORM ,
+ * ODM , ORM ,
+ * Object Document Mapping => NoSQL
+ * Object Relational Mapping => SQL
  */
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const bcrypt = require('bcryptjs')
+
+const mongoose = require('./configdb/db');
+const User = require('./models/user');
 
 const app = express()
 app.use(bodyParser.json());
@@ -24,16 +34,35 @@ app.get('/', function (req, res) {
 app.post('/user/register', (req, res) => {
     //1- recupération des données
     let data = req.body;
-    console.log(data);
-    
-    //2- enregistrement data => BD
 
-    //3- return lel front
-    res.send({ message: "User registered successfully !" });
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(data.password,salt)
+
+    //2- enregistrement data => BD
+    let user = new User({
+        firstname: data.firstname,
+        lastname: data.lastname,
+        phone: data.phone,
+        email: data.email,
+        password: hashedPassword,
+    });
+
+    //objet eli raj3ou el fonction save , ynajm ykoun
+    //1- objet JSON fih les odnnées ei tsajlou , en cas de succceees
+    //2- object JSON fih des erreurs
+    user.save()
+        .then((doc) => {
+            res.send({ message: "User registered successfully !" });
+        })
+        .catch((err) => {
+            res.send({ message: "Error" });
+        })
+
+
 });
 
-app.post('/user/login',(req,res)=>{
-    let data = req.body ;
+app.post('/user/login', (req, res) => {
+    let data = req.body;
     console.log(data);
     res.send({ message: "User Logged successfully !" });
 })
