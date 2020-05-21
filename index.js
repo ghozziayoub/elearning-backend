@@ -20,6 +20,7 @@ const User = require('./models/user');
 
 const app = express()
 app.use(bodyParser.json());
+app.use(cors());
 
 //WEB SERIVCE
 //NOM WEB SERIVCE = methode + path
@@ -30,13 +31,25 @@ app.get('/', function (req, res) {
     res.send("Welcome to the server ");
 })
 
+
+app.get('/users', (req, res) => {
+
+    User.find()
+        .then((users) => {
+            res.send(users);
+        })
+        .catch((err) => {
+            res.send({ message: "Error" });
+        })
+})
+
 //requette HTTP => GET , POST 
 app.post('/user/register', (req, res) => {
     //1- recupération des données
     let data = req.body;
 
     const salt = bcrypt.genSaltSync(10);
-    const hashedPassword = bcrypt.hashSync(data.password,salt)
+    const hashedPassword = bcrypt.hashSync(data.password, salt)
 
     //2- enregistrement data => BD
     let user = new User({
