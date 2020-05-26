@@ -22,6 +22,7 @@ const app = express()
 app.use(bodyParser.json());
 app.use(cors());
 
+
 //WEB SERIVCE
 //NOM WEB SERIVCE = methode + path
 //GET POST
@@ -65,13 +66,11 @@ app.post('/user/register', (req, res) => {
     //2- object JSON fih des erreurs
     user.save()
         .then((doc) => {
-            res.send({ message: "User registered successfully !" });
+            res.status(200).send({ message: "User registered successfully !" });
         })
         .catch((err) => {
-            res.send({ message: "Error" });
+            res.status(400).send({ message: "Error" });
         })
-
-
 });
 
 app.post('/user/login', (req, res) => {
