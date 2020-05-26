@@ -10,18 +10,26 @@
  * Object Document Mapping => NoSQL
  * Object Relational Mapping => SQL
  */
+
+//Importation des bibliothéque
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const bcrypt = require('bcryptjs')
 
+//Importation DB
 const mongoose = require('./configdb/db');
-const User = require('./models/user');
+
+//Importation Controllers
+const userController = require('./controllers/userController');
+const instructorController = require('./controllers/instructorController');
 
 const app = express()
 app.use(bodyParser.json());
 app.use(cors());
 
+app.use('/user',userController);
+app.use('/instructor',instructorController);
 
 //WEB SERIVCE
 //NOM WEB SERIVCE = methode + path
@@ -31,53 +39,8 @@ app.use(cors());
 app.get('/', function (req, res) {
     res.send("Welcome to the server ");
 })
+//USER , INSTRUCTOR , SUPER_ADMIN
 
-
-app.get('/users', (req, res) => {
-
-    User.find()
-        .then((users) => {
-            res.send(users);
-        })
-        .catch((err) => {
-            res.send({ message: "Error" });
-        })
-})
-
-//requette HTTP => GET , POST 
-app.post('/user/register', (req, res) => {
-    //1- recupération des données
-    let data = req.body;
-
-    const salt = bcrypt.genSaltSync(10);
-    const hashedPassword = bcrypt.hashSync(data.password, salt)
-
-    //2- enregistrement data => BD
-    let user = new User({
-        firstname: data.firstname,
-        lastname: data.lastname,
-        phone: data.phone,
-        email: data.email,
-        password: hashedPassword,
-    });
-
-    //objet eli raj3ou el fonction save , ynajm ykoun
-    //1- objet JSON fih les odnnées ei tsajlou , en cas de succceees
-    //2- object JSON fih des erreurs
-    user.save()
-        .then((doc) => {
-            res.status(200).send({ message: "User registered successfully !" });
-        })
-        .catch((err) => {
-            res.status(400).send({ message: "Error" });
-        })
-});
-
-app.post('/user/login', (req, res) => {
-    let data = req.body;
-    console.log(data);
-    res.send({ message: "User Logged successfully !" });
-})
 
 //1 - creation du sreveur 
 //callback function
