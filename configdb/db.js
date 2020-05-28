@@ -1,5 +1,12 @@
 const mongoose = require('mongoose');
 
-mongoose.connect("mongodb://localhost:27017/elearning");
+const options = {
+    useCreateIndex: true,
+    useFindAndModify: true,
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}
 
-module.exports = mongoose ;
+mongoose.connect("mongodb://localhost:27017/elearning", options);
+
+module.exports = mongoose;

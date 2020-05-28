@@ -1,14 +1,13 @@
-//Importation libs
 const express = require('express');
+const bcrypt = require('bcryptjs');
 
-//Importation Models
 const User = require('./../models/user');
 
 const app = express();
 
 app.get('/', (req, res) => {
     res.status(200).send({ message: "Welcome to User Controller" })
-})
+});
 
 app.get('/all', (req, res) => {
     User.find()
@@ -20,7 +19,6 @@ app.get('/all', (req, res) => {
         })
 });
 
-//requette HTTP => GET , POST 
 app.post('/register', (req, res) => {
     //1- recupération des données
     let data = req.body;
