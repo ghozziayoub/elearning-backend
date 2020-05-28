@@ -40,7 +40,6 @@ app.get('/all', (req, res) => {
 
 });
 
-//TODO: safé mch fehma
 app.get('/one/:idInstructor', (req, res) => {
 
     let id = req.params.idInstructor;
@@ -87,7 +86,7 @@ app.patch('/updateAccountState/:idInstructor', (req, res) => {
 });
 
 app.patch('/updateInfo', (req, res) => {
-//lodash
+
     let newData = {
         firstname: req.body.firstname,
         lastname: req.body.lastname,
@@ -105,9 +104,6 @@ app.patch('/updateInfo', (req, res) => {
         })
 
 });
-
-
-
 
 function generatePassword() {
     let pass = "123456789";
