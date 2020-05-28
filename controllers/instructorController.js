@@ -2,7 +2,6 @@ const express = require('express');
 
 const Instructor = require('./../models/instructor');
 
-
 const app = express();
 
 app.post('/register', (req, res) => {
@@ -32,28 +31,83 @@ app.post('/register', (req, res) => {
 app.get('/all', (req, res) => {
 
     Instructor.find()
-        .then((docs)=>{
+        .then((docs) => {
             res.status(200).send(docs);
         })
-        .catch(()=>{
+        .catch(() => {
             res.status(400).send({ message: "Error Find !" })
         })
 
-})
+});
 
+//TODO: safé mch fehma
 app.get('/one/:idInstructor', (req, res) => {
 
     let id = req.params.idInstructor;
 
-    Instructor.findOne({_id:id})
-        .then((doc)=>{
+    Instructor.findOne({ _id: id })
+        .then((doc) => {
             res.status(200).send(doc);
         })
-        .catch(()=>{
+        .catch(() => {
             res.status(400).send({ message: "Error Find !" })
         })
 
-})
+});
+
+app.delete('/delete/:idInstructor', (req, res) => {
+
+    let id = req.params.idInstructor;
+
+    Instructor.findOneAndDelete({ _id: id })
+        .then((doc) => {
+            res.status(200).send({ message: "Instructor Deleted !" });
+        })
+        .catch(() => {
+            res.status(400).send({ message: "Error Find !" });
+        })
+
+});
+
+//PATCH & PUT
+app.patch('/updateAccountState/:idInstructor', (req, res) => {
+
+    let id = req.params.idInstructor;
+
+    Instructor.findOne({ _id: id })
+        .then((doc) => {
+            doc.accountState = !doc.accountState;
+            doc.save();
+            res.status(200).send({ message: "Instructor's Account State Updated !" });
+        })
+        .catch(() => {
+            res.status(400).send({ message: "Error Find !" });
+        })
+
+});
+
+app.patch('/updateInfo', (req, res) => {
+//lodash
+    let newData = {
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
+        email: req.body.email,
+        phone: req.body.phone,
+        password: req.body.password
+    };
+
+    Instructor.findOneAndUpdate({ _id: req.body.id },newData)
+        .then(() => {
+            res.status(200).send({ message: "Instructor's Info Updated !" });
+        })
+        .catch(() => {
+            res.status(400).send({ message: "Error Find !" });
+        })
+
+});
+
+
+
 
 function generatePassword() {
     let pass = "123456789";
