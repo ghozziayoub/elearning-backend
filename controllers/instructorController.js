@@ -1,10 +1,13 @@
 const express = require('express');
 const nodemailer = require("nodemailer");
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const Instructor = require('./../models/instructor');
 
 const app = express();
 
+//POST
 app.post('/register', (req, res) => {
     //1- recupération des données
     let data = req.body;
@@ -28,6 +31,58 @@ app.post('/register', (req, res) => {
 
 });
 
+app.post('/login', (req, res) => {
+
+    let emailFromFront = req.body.email;
+    let passwordFromFront = req.body.password;
+
+    Instructor.findOne({ email: emailFromFront })
+        .then((doc) => {
+
+            if (!doc) {
+                res.status(404).send({ "message": "email incorrect !" });
+            }
+            else {
+
+                let compare = bcrypt.compareSync(passwordFromFront, doc.password);
+
+                if (!compare) {
+                    res.status(404).send({ "message": "password incorrect !" });
+                }
+                else {
+
+                    if (!doc.accountState) {
+                        res.status(404).send({ "message": "You cannot Login !" });
+                    }
+                    else {
+
+                        let obj = {
+                            idInstructor: doc._id
+                        };
+
+                        let myToken = jwt.sign(obj, "mySecretKey");
+
+                        res.status(200).send({ token: myToken });
+
+                    }
+
+                }
+
+            }
+
+
+
+
+        })
+        .catch(() => {
+            res.status(400).send({ message: "Error Find !" })
+        })
+
+
+});
+
+
+//GET
 app.get('/all', (req, res) => {
 
     Instructor.find()
@@ -54,6 +109,8 @@ app.get('/one/:idInstructor', (req, res) => {
 
 });
 
+
+//DELETE
 app.delete('/delete/:idInstructor', (req, res) => {
 
     let id = req.params.idInstructor;
@@ -68,7 +125,6 @@ app.delete('/delete/:idInstructor', (req, res) => {
 
 });
 
-//FIXME: cryptage password
 //PATCH & PUT
 app.patch('/updateAccountState/:idInstructor', (req, res) => {
 
@@ -80,28 +136,29 @@ app.patch('/updateAccountState/:idInstructor', (req, res) => {
             if (!doc.password && !doc.accountState) {
                 let newPassword = generatePassword();
 
-                //start sending email code
+                const salt = bcrypt.genSaltSync(10);
+                const hashedPassword = bcrypt.hashSync(newPassword, salt);
 
-                // async..await is not allowed in global scope, must use a wrapper
+                //start sending email code
+                /*
                 async function main() {
-                   
-                    // create reusable transporter object using the default SMTP transport
+
                     let transporter = nodemailer.createTransport({
                         host: "smtp.gmail.com",
                         port: 587,
-                        secure: false, // true for 465, false for other ports
+                        secure: false,
                         auth: {
-                            user: "tonemail@gmail.com", // generated ethereal user
-                            pass: "tonpassword" , // generated ethereal password
+                            user: "tonemail@gmail.com",
+                            pass: "tonpassword",
                         },
                     });
 
                     let mailOptions = {
-                        from: '"Support 👨‍💻" <tonemail@gmail.com>', // sender address
-                        to: doc.email, // list of receivers
-                        subject: "Activation Compte ✔", // Subject line
-                        text: "Votre compte est activé", // plain text body
-                        html: "<b>Votre compte est activé</b>" // html body
+                        from: '"Support 👨‍💻" <tonemail@gmail.com>',
+                        to: doc.email,
+                        subject: "Activation Compte ✔",
+                        text: "Votre compte est activé",
+                        html: "<b>Votre compte est activé</b>"
                     };
 
                     transporter.sendMail(mailOptions, (error, info) => {
@@ -111,13 +168,13 @@ app.patch('/updateAccountState/:idInstructor', (req, res) => {
                         console.log('success');
                     });
 
-                  }
-
+                }
                 main().catch(console.error);
+                */
                 //end sending email code
 
 
-                doc.password = newPassword;
+                doc.password = hashedPassword;
             }
 
             doc.accountState = !doc.accountState;
@@ -130,15 +187,16 @@ app.patch('/updateAccountState/:idInstructor', (req, res) => {
 
 });
 
-//FIXME: cryptage password
 app.patch('/updateInfo', (req, res) => {
+
+    const salt = bcrypt.genSaltSync(10);
 
     let newData = {
         firstname: req.body.firstname,
         lastname: req.body.lastname,
         email: req.body.email,
         phone: req.body.phone,
-        password: req.body.password
+        password: bcrypt.hashSync(req.body.password, salt)
     };
 
     Instructor.findOneAndUpdate({ _id: req.body.id }, newData)
@@ -157,8 +215,9 @@ function generatePassword() {
     var charactersLength = characters.length;
 
     for (var i = 0; i < 10; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        result = result + characters.charAt(Math.floor(Math.random() * charactersLength));
     }
+
     return result;
 }
 
