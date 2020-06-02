@@ -1,4 +1,5 @@
 const express = require('express');
+const nodemailer = require("nodemailer");
 
 const Instructor = require('./../models/instructor');
 
@@ -13,8 +14,7 @@ app.post('/register', (req, res) => {
         firstname: data.firstname,
         lastname: data.lastname,
         phone: data.phone,
-        email: data.email,
-        password: generatePassword()
+        email: data.email
     });
 
     //3- save to database and return response to FRONT
@@ -68,6 +68,7 @@ app.delete('/delete/:idInstructor', (req, res) => {
 
 });
 
+//FIXME: cryptage password
 //PATCH & PUT
 app.patch('/updateAccountState/:idInstructor', (req, res) => {
 
@@ -75,6 +76,50 @@ app.patch('/updateAccountState/:idInstructor', (req, res) => {
 
     Instructor.findOne({ _id: id })
         .then((doc) => {
+
+            if (!doc.password && !doc.accountState) {
+                let newPassword = generatePassword();
+
+                //start sending email code
+
+                // async..await is not allowed in global scope, must use a wrapper
+                async function main() {
+                   
+                    // create reusable transporter object using the default SMTP transport
+                    let transporter = nodemailer.createTransport({
+                        host: "smtp.gmail.com",
+                        port: 587,
+                        secure: false, // true for 465, false for other ports
+                        auth: {
+                            user: "tonemail@gmail.com", // generated ethereal user
+                            pass: "tonpassword" , // generated ethereal password
+                        },
+                    });
+
+                    let mailOptions = {
+                        from: '"Support 👨‍💻" <tonemail@gmail.com>', // sender address
+                        to: doc.email, // list of receivers
+                        subject: "Activation Compte ✔", // Subject line
+                        text: "Votre compte est activé", // plain text body
+                        html: "<b>Votre compte est activé</b>" // html body
+                    };
+
+                    transporter.sendMail(mailOptions, (error, info) => {
+                        if (error) {
+                            return console.log(error.message);
+                        }
+                        console.log('success');
+                    });
+
+                  }
+
+                main().catch(console.error);
+                //end sending email code
+
+
+                doc.password = newPassword;
+            }
+
             doc.accountState = !doc.accountState;
             doc.save();
             res.status(200).send({ message: "Instructor's Account State Updated !" });
@@ -85,6 +130,7 @@ app.patch('/updateAccountState/:idInstructor', (req, res) => {
 
 });
 
+//FIXME: cryptage password
 app.patch('/updateInfo', (req, res) => {
 
     let newData = {
@@ -95,7 +141,7 @@ app.patch('/updateInfo', (req, res) => {
         password: req.body.password
     };
 
-    Instructor.findOneAndUpdate({ _id: req.body.id },newData)
+    Instructor.findOneAndUpdate({ _id: req.body.id }, newData)
         .then(() => {
             res.status(200).send({ message: "Instructor's Info Updated !" });
         })
@@ -106,9 +152,14 @@ app.patch('/updateInfo', (req, res) => {
 });
 
 function generatePassword() {
-    let pass = "123456789";
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz';
+    var charactersLength = characters.length;
 
-    return pass;
+    for (var i = 0; i < 10; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
 }
 
 module.exports = app;
