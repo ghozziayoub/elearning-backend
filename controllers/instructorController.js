@@ -83,16 +83,13 @@ app.post('/login', (req, res) => {
 
 
 //GET
-app.get('/all', (req, res) => {
-
-    Instructor.find()
-        .then((docs) => {
-            res.status(200).send(docs);
-        })
-        .catch(() => {
-            res.status(400).send({ message: "Error Find !" })
-        })
-
+app.get('/all', async (req, res) => {
+    try {
+        let instructors = await Instructor.find();
+        res.status(200).send(instructors);
+    } catch {
+        res.status(400).send({ message: "Error Find !" })
+    }
 });
 
 app.get('/one/:idInstructor', (req, res) => {
