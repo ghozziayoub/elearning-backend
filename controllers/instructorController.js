@@ -57,7 +57,8 @@ app.post('/login', (req, res) => {
                     else {
 
                         let obj = {
-                            idInstructor: doc._id
+                            idInstructor: doc._id,
+                            role: "instructor"
                         };
 
                         let myToken = jwt.sign(obj, "mySecretKey");
@@ -80,7 +81,6 @@ app.post('/login', (req, res) => {
 
 
 });
-
 
 //GET
 app.get('/all', async (req, res) => {
@@ -105,7 +105,6 @@ app.get('/one/:idInstructor', (req, res) => {
         })
 
 });
-
 
 //DELETE
 app.delete('/delete/:idInstructor', (req, res) => {
