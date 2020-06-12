@@ -22,5 +22,5 @@
 # WEB SERIVCE
 //NOM WEB SERIVCE = methode + path
 //GET POST DELETE PATCH
-//le 1er : objet => Request : on peut manipuler les données eli jeyin lel WS
-//le 2eme : objet => Respose : on peut manipluer les donne eli nhebou nab3thouhom mel WS
+//le 1er : objet => Request : on peut manipuler les données eli jeyin mel Front
+//le 2eme : objet => Respose : on peut manipluer les données eli nhebou nab3thouhom lel Front

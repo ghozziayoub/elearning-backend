@@ -12,7 +12,6 @@ const RequestsClassroomController = require('./controllers/requestsClassroomCont
 
 const Admin = require('./models/admin');
 
-
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
@@ -25,6 +24,15 @@ app.use('/requestsClassroom', RequestsClassroomController);
 app.get('/', function (req, res) {
     res.send("Welcome to the server !");
 })
+
+app.get('/testChartJsData', (req, res) => {
+    let years = ['Ali', 'Fathi', 'Mouldi', 'Mohamed'];
+    let data = [
+        { data: [4, 16, 15, 34], label: 'Series A' }
+    ];
+
+    res.status(200).send({ years, data })
+});
 
 app.listen(3000, async () => {
 
@@ -40,7 +48,7 @@ app.listen(3000, async () => {
             let savedAdmin = await admin.save();
             console.log("Admin Added");
         }
-        
+
         console.log("Server Stated !");
     } catch (error) {
         console.log(error);
