@@ -9,6 +9,7 @@ const userController = require('./controllers/userController');
 const instructorController = require('./controllers/instructorController');
 const classroomController = require('./controllers/classroomController');
 const RequestsClassroomController = require('./controllers/requestsClassroomController');
+const adminController = require('./controllers/adminController');
 
 const Admin = require('./models/admin');
 
@@ -20,6 +21,7 @@ app.use('/user', userController);
 app.use('/instructor', instructorController);
 app.use('/classroom', classroomController);
 app.use('/requestsClassroom', RequestsClassroomController);
+app.use('/admin', adminController);
 
 app.get('/', function (req, res) {
     res.send("Welcome to the server !");
