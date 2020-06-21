@@ -73,7 +73,8 @@ app.listen(port, async () => {
             console.log("Admin Added");
         }
 
-        res.status(200).send("Welcome to the server");
+        console.log("Server Started");
+
     } catch (error) {
         console.log(error);
     }
