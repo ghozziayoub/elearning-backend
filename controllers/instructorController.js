@@ -131,7 +131,8 @@ app.patch('/updateAccountState/:idInstructor', (req, res) => {
 
             if (!doc.password && !doc.accountState) {
                 let newPassword = generatePassword();
-
+                console.log(newPassword);
+                
                 const salt = bcrypt.genSaltSync(10);
                 const hashedPassword = bcrypt.hashSync(newPassword, salt);
 
