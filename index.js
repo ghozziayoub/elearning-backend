@@ -36,7 +36,9 @@ app.get('/testChartJsData', (req, res) => {
     res.status(200).send({ years, data })
 });
 
-app.listen(3000, async () => {
+const port = 3000 ||  process.env.PORT 
+
+app.listen(port, async () => {
 
     try {
         let admins = await Admin.find();

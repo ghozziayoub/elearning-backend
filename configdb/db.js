@@ -7,6 +7,8 @@ const options = {
     useUnifiedTopology: true
 }
 
-mongoose.connect("mongodb://localhost:27017/elearning", options);
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/elearning'
+
+mongoose.connect(MONGODB_URI, options);
 
 module.exports = mongoose;
