@@ -2,6 +2,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
+const fs = require('fs');
+
+//connect-multiparty OU multer
+const multipart = require('connect-multiparty');
+const multipartMiddleware = multipart({ uploadDir: './public' });
 
 const mongoose = require('./configdb/db');
 
@@ -14,6 +19,10 @@ const adminController = require('./controllers/adminController');
 const Admin = require('./models/admin');
 
 const app = express();
+//make public DIR accessible
+app.use(express.static('public'));
+//Accept Files
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -36,7 +45,18 @@ app.get('/testChartJsData', (req, res) => {
     res.status(200).send({ years, data })
 });
 
-const port = 3000 ||  process.env.PORT 
+app.post('/testFileAndData', multipartMiddleware, (req, res) => {
+
+    if (req.files) {
+        let path = req.files.image.path;
+        let ext = path.substr(path.indexOf('.'));
+        let newName = "abc";
+        fs.renameSync(path, "public/" + newName + ext);
+    }
+    res.status(200).send('OK');
+})
+
+const port = 3000 || process.env.PORT
 
 app.listen(port, async () => {
 
